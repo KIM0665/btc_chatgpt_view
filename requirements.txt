@@ -3,3 +3,4 @@ pyupbit
 pandas
 mysql-connector-python
 python-dotenv
+pytz
