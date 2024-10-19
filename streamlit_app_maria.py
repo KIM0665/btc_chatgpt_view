@@ -1,4 +1,5 @@
 import streamlit as st
+import sqlite3
 import pandas as pd
 from datetime import datetime
 import pyupbit
@@ -14,6 +15,8 @@ db_password = st.secrets["DB_PASSWORD"]
 db_name = st.secrets["DB_NAME"]
 
 def load_data():
+    print(f"Connecting to DB at {db_host} with user {db_user}")
+    
     try:
         conn = mysql.connector.connect(
             host=db_host,
@@ -30,7 +33,13 @@ def load_data():
                                                'btc_balance', 'krw_balance', 
                                                'btc_avg_buy_price', 'btc_krw_price'])
         
+        conn.commit()  # Commit changes if any
         conn.close()  # Close the connection
+        
+        # 'timestamp' 컬럼을 KST 시간대가 포함된 datetime으로 변환
+        korea_tz = pytz.timezone('Asia/Seoul')
+        df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_localize('UTC').dt.tz_convert(korea_tz)
+        
         return df
     except Exception as e:
         st.error(f"Error connecting to the database: {e}")
@@ -53,14 +62,14 @@ def main():
         current_value = int(btc_balance * current_price + krw_balance)
         
         # Start time
-        start_time = pd.to_datetime(df.iloc[0]['timestamp'])
+        start_time = df.iloc[0]['timestamp']
         korea_tz = pytz.timezone('Asia/Seoul')
 
         # 실시간 업데이트를 위한 빈 공간 생성
         time_display = st.empty()
         info_display = st.empty()
         
-        for _ in range(3600):  # 최대 1시간 동안 1초마다 업데이트
+        while True:
             # 현재 시간을 KST로 업데이트
             korea_time = datetime.now(korea_tz)
             time_diff = korea_time - start_time
@@ -86,6 +95,8 @@ def main():
 
             # 1초 간격으로 업데이트
             time.sleep(1)
+            # 페이지 자동 새로고침
+            st.experimental_rerun()
 
 if __name__ == '__main__':
     main()
