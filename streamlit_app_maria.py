@@ -5,7 +5,7 @@ from datetime import datetime
 import pyupbit
 import mysql.connector
 import time
-
+import pytz
 # Load secrets from Streamlit Cloud
 db_host = st.secrets["HOST"]
 db_port = st.secrets["PORT"]
