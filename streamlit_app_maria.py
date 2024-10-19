@@ -4,6 +4,7 @@ import pandas as pd
 from datetime import datetime
 import pyupbit
 import mysql.connector
+import time
 
 # Load secrets from Streamlit Cloud
 db_host = st.secrets["HOST"]
@@ -60,16 +61,27 @@ def main():
         minutes = (time_diff.seconds % 3600) // 60
 
         st.header("수익률:" + str(round((current_value - start_value) / start_value * 100, 2)) + "%")
-        st.write("현재 시각:" + str(datetime.now()))
-        st.write("투자기간:", days, "일", hours, "시간", minutes, "분")
-        st.write("시작 원금", start_value, "원")
-        st.write("현재 비트코인 가격:", current_price, "원")
-        st.write("현재 보유 현금:", krw_balance, "원")
-        st.write("현재 보유 비트코인:", btc_balance, "BTC")
-        st.write("BTC 매수 평균가격:", btc_avg_buy_price, "원")
-        st.write("현재 원화 가치 평가:", current_value, "원")
+        
+        # 실시간 업데이트를 위한 빈 공간 생성
+        time_display = st.empty()
+        
+        while True:
+            # 현재 시간을 KST로 업데이트
+            kst_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            time_display.write("현재 시각: " + kst_now)
+            
+            st.write("투자기간:", days, "일", hours, "시간", minutes, "분")
+            st.write("시작 원금", start_value, "원")
+            st.write("현재 비트코인 가격:", current_price, "원")
+            st.write("현재 보유 현금:", krw_balance, "원")
+            st.write("현재 보유 비트코인:", btc_balance, "BTC")
+            st.write("BTC 매수 평균가격:", btc_avg_buy_price, "원")
+            st.write("현재 원화 가치 평가:", current_value, "원")
+            
+            st.dataframe(df, use_container_width=True)
 
-        st.dataframe(df, use_container_width=True)
+            # 1초 간격으로 업데이트
+            time.sleep(1)
 
 if __name__ == '__main__':
     main()
