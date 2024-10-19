@@ -1,5 +1,5 @@
 streamlit
 pyupbit
 pandas
-mariadb
+mysql-connector-python
 python-dotenv
