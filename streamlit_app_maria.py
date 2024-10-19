@@ -3,7 +3,7 @@ import sqlite3
 import pandas as pd
 from datetime import datetime
 import pyupbit
-import mariadb
+import mysql.connector
 
 # Load secrets from Streamlit Cloud
 db_host = st.secrets["HOST"]
@@ -16,7 +16,7 @@ def load_data():
     print(f"Connecting to DB at {db_host} with user {db_user}")
     
     try:
-        conn = mariadb.connect(
+        conn = mysql.connector.connect(
             host=db_host,
             port=db_port,
             user=db_user,
