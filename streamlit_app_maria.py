@@ -30,7 +30,7 @@ def load_data():
         df = pd.DataFrame(decisions, columns=['timestamp', 'decision', 'percentage', 'reason', 
                                                'btc_balance', 'krw_balance', 
                                                'btc_avg_buy_price', 'btc_krw_price'])
-        
+        conn.commit()
         conn.close()  # Close the connection
         return df
     except Exception as e:
