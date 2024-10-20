@@ -33,7 +33,7 @@ def load_data():
         conn.close()  # Close the connection
         
         # 시간대 설정: UTC로 지정한 후 한국 시간대로 변환
-        df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_localize('UTC').dt.tz_convert('Asia/Seoul')
+        df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_localize('UTC').dt.tz_convert('UTC')
         
         return df
     except Exception as e:
