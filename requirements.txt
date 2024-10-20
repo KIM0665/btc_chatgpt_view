@@ -1,9 +1,8 @@
-streamlit
-pyupbit
-pandas
-mysql-connector-python
-python-dotenv
-pytz
-numpy
-requests
-time
+streamlit==1.39.0
+pyupbit==0.2.34
+pandas==2.2.3
+mysql-connector-python==9.1.0
+python-dotenv==1.0.1
+pytz==2024.2
+numpy==2.1.2
+requests==2.32.3
