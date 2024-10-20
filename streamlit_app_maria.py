@@ -37,7 +37,7 @@ def load_data():
         conn.close()  # Close the connection
         
         # 'timestamp' 컬럼을 KST 시간대가 포함된 datetime으로 변환
-      #  korea_tz = pytz.timezone('Asia/Seoul')
+        korea_tz = pytz.timezone('Asia/Seoul')
        # df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_localize('UTC').dt.tz_convert(korea_tz)
         
         return df
