@@ -1,10 +1,8 @@
 import streamlit as st
-import sqlite3
 import pandas as pd
 from datetime import datetime
 import pyupbit
 import mysql.connector
-import time
 import pytz
 
 # Load secrets from Streamlit Cloud
@@ -33,13 +31,7 @@ def load_data():
                                                'btc_balance', 'krw_balance', 
                                                'btc_avg_buy_price', 'btc_krw_price'])
         
-        conn.commit()  # Commit changes if any
         conn.close()  # Close the connection
-        
-        # 'timestamp' 컬럼을 KST 시간대가 포함된 datetime으로 변환
-        korea_tz = pytz.timezone('Asia/Seoul')
-       # df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_localize('UTC').dt.tz_convert(korea_tz)
-        
         return df
     except Exception as e:
         st.error(f"Error connecting to the database: {e}")
@@ -50,7 +42,7 @@ def main():
     st.title("실시간 비트코인 GPT 자동매매 기록")
     st.write("by 김기윤 수정버전 mariaDB")
     st.write("---")
-
+    
     df = load_data()
     if not df.empty:
         start_value = 100000
@@ -60,22 +52,14 @@ def main():
         krw_balance = latest_row['krw_balance']
         btc_avg_buy_price = latest_row['btc_avg_buy_price']
         current_value = int(btc_balance * current_price + krw_balance)
-        
-        # Start time
-        start_time = df.iloc[0]['timestamp']
-        korea_tz = pytz.timezone('Asia/Seoul')
 
-        # 실시간 업데이트를 위한 빈 공간 생성
-        time_display = st.empty()
-        info_display = st.empty()
-        
-
-        # 현재 시간을 KST로 업데이트
-        korea_time = datetime.now(korea_tz)
-        time_diff = korea_time - start_time
+        # 현재 시간을 한국 시간으로 설정
+        korea_time = datetime.now(pytz.timezone('Asia/Seoul'))
+        time_diff = korea_time - pd.to_datetime(df.iloc[0]['timestamp'])
         days = time_diff.days
         hours = time_diff.seconds // 3600
         minutes = (time_diff.seconds % 3600) // 60
+
         st.header("수익률:" + str(round((current_value - start_value) / start_value * 100, 2)) + "%")
         st.write(f"현재 시각: {korea_time.strftime('%Y-%m-%d %H:%M:%S')}")
         st.write("투자기간:", days, "일", hours, "시간", minutes, "분")
@@ -86,9 +70,7 @@ def main():
         st.write("BTC 매수 평균가격:", btc_avg_buy_price, "원")
         st.write("현재 원화 가치 평가:", current_value, "원")
 
-        # 데이터프레임 표시
         st.dataframe(df, use_container_width=True)
-
 
 if __name__ == '__main__':
     main()
