@@ -30,8 +30,11 @@ def load_data():
         df = pd.DataFrame(decisions, columns=['timestamp', 'decision', 'percentage', 'reason', 
                                                'btc_balance', 'krw_balance', 
                                                'btc_avg_buy_price', 'btc_krw_price'])
-        conn.commit()
         conn.close()  # Close the connection
+        
+        # 시간대 설정: UTC로 지정한 후 한국 시간대로 변환
+        df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_localize('UTC').dt.tz_convert('Asia/Seoul')
+        
         return df
     except Exception as e:
         st.error(f"Error connecting to the database: {e}")
@@ -55,7 +58,7 @@ def main():
 
         # 현재 시간을 한국 시간으로 설정
         korea_time = datetime.now(pytz.timezone('Asia/Seoul'))
-        time_diff = korea_time - pd.to_datetime(df.iloc[0]['timestamp'])
+        time_diff = korea_time - df.iloc[0]['timestamp']
         days = time_diff.days
         hours = time_diff.seconds // 3600
         minutes = (time_diff.seconds % 3600) // 60
